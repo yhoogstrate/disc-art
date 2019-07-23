@@ -13,7 +13,7 @@ def get_requirements():
 
 setup(name="disc-art",
       scripts=['bin/disc-art'],
-      packages=["src"],
+      packages=["discart"],
       test_suite="tests",
       tests_require=['nose2', 'pytest', 'pytest-cov'],
       setup_requires=[],# scipy, numpy
