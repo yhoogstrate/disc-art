@@ -22,58 +22,60 @@ fa = "/home/youri/bio/fasta/hg38.fa"
 @click.argument('input_fasta_file', type=click.Path(exists=True))
 @click.argument('input_alignment_file', type=click.Path(exists=True))
 def CLI(input_fasta_file, input_alignment_file):
-        """
-        This tool estimates hexamer artifacts, which requirest the genomic sequence in FASTA + FAI format, followed by the ALIGNMENT file in sorted bam.
-        """
+    """
+    This tool estimates hexamer artifacts, which requirest the genomic sequence in FASTA + FAI format, followed by the ALIGNMENT file in sorted bam.
+    """
 
-        # index to search for string codes
-        query_idx = {}
-        artifacted = []
+    # index to search for string codes
+    query_idx = {}
+    artifacted = []
 
-        with Fasta(input_fasta_file) as genes, pysam.AlignmentFile(bam, "rb") as fh:
-            for _ in fh.fetch():
-                if _.has_tag('SA'):
-                    for __ in [__ for __ in _.get_tag('SA').split(";") if len(__) > 0]:
-                        __ = __.split(",")
-                        __[1] = int(__[1]) 
-                        #print(_.query_name + " :  " , __)
+    with Fasta(input_fasta_file) as genes, pysam.AlignmentFile(bam, "rb") as fh:
+        for _ in fh.fetch():
+            if _.has_tag('SA'):
+                for __ in [__ for __ in _.get_tag('SA').split(";") if len(__) > 0]:
+                    __ = __.split(",")
+                    __[1] = int(__[1]) 
+                    #print(_.query_name + " :  " , __)
 
-                        a = str(genes[__[0]][__[1] - 6 - 1:__[1] - 1])
-                        #a = sorted([a, revcomp(a)])[0]
-                        #print ("     A   : ", a)
+                    a = str(genes[__[0]][__[1] - 6 - 1:__[1] - 1])
+                    #a = sorted([a, revcomp(a)])[0]
+                    #print ("     A   : ", a)
 
-                        b = str(genes[__[0]][__[1] - 1 : __[1] - 1 + 6])
-                        #b = sorted([b, revcomp(b)])[0]
-                        #print ("     B   : ", b)
+                    b = str(genes[__[0]][__[1] - 1 : __[1] - 1 + 6])
+                    #b = sorted([b, revcomp(b)])[0]
+                    #print ("     B   : ", b)
 
-                        end = __[1] + bam_parse_alignment_offset(cigar_to_cigartuple(__[3]))
-                        c = str(genes[__[0]][end - 6 - 1: end - 1])
-                        #c = sorted([c, revcomp(c)])[0]
-                        #print ("     C   : ", c)
-                        
-                        d = str(genes[__[0]][end - 1: end - 1 + 6])
-                        #d = sorted([d, revcomp(d)])[0]
-                        #print ("     D   : ", d)
+                    end = __[1] + bam_parse_alignment_offset(cigar_to_cigartuple(__[3]))
+                    c = str(genes[__[0]][end - 6 - 1: end - 1])
+                    #c = sorted([c, revcomp(c)])[0]
+                    #print ("     C   : ", c)
+                    
+                    d = str(genes[__[0]][end - 1: end - 1 + 6])
+                    #d = sorted([d, revcomp(d)])[0]
+                    #print ("     D   : ", d)
 
-                        if not _.query_name in query_idx:
-                            query_idx[_.query_name] = set([a, b, c, d])
+                    if not _.query_name in query_idx:
+                        query_idx[_.query_name] = set([a, b, c, d])
+                    else:
+                        isct = query_idx[_.query_name].intersection(set([a, b, c, d]))
+                        isct = [_+"/"+_ for _ in isct]
+
+                        if len(  isct  ) == 1:
+                            artifacted.append([_.query_name, list(isct)])
+                            del(query_idx[_.query_name])
                         else:
-                            isct = query_idx[_.query_name].intersection(set([a, b, c, d]))
-                            isct = [_+"/"+_ for _ in isct]
+                            isct = query_idx[_.query_name].intersection(set([revcomp(a), revcomp(b), revcomp(c), revcomp(d)]))
+                            isct = [_+"/"+revcomp(_) for _ in isct]
 
                             if len(  isct  ) == 1:
                                 artifacted.append([_.query_name, list(isct)])
-                                del(query_idx[_.query_name])
-                            else:
-                                isct = query_idx[_.query_name].intersection(set([revcomp(a), revcomp(b), revcomp(c), revcomp(d)]))
-                                isct = [_+"/"+revcomp(_) for _ in isct]
 
-                                if len(  isct  ) == 1:
-                                    artifacted.append([_.query_name, list(isct)])
-                                    del(query_idx[_.query_name])
+                        # assume only 2 split reads per mate - if the second is encountered, idx can safely be cleaned
+                        del(query_idx[_.query_name])
 
-        for _ in artifacted:
-            print (_[0] + "\t" + ",".join(_[1]))
+    for _ in artifacted:
+        print (_[0] + "\t" + ",".join(_[1]))
 
 
 
