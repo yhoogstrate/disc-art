@@ -7,6 +7,7 @@ import re
 import pysam
 
 
+
 pat_bam_parse_alignment_offset_using_cigar = re.compile("([0-9]+)([MIDNSHPX=])")
 def cigar_to_cigartuple(cigar_str):
     """Converts a CIGAR string into a tuple compatible with Pysam.
@@ -99,5 +100,5 @@ def bam_parse_alignment_offset(cigartuple, skip_N=False):
 
 
 def revcomp(seq):
-    return seq.translate(str.maketrans("ACTGactg","TGACtgac"))
+    return seq.translate(str.maketrans("ACTGactg","TGACtgac"))[::-1]
     

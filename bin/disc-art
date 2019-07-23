@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+from tqdm import tqdm
+
+
 import pysam
 from pyfaidx import Fasta
 
@@ -14,33 +17,28 @@ fa = "/home/youri/bio/fasta/hg38.fa"
 
 
 with Fasta(fa) as genes, pysam.AlignmentFile(bam, "rb") as fh:
-        print("ALIVE")
-        
-        for _ in fh.fetch():
-            if _.has_tag('SA'):
-                for __ in [__ for __ in _.get_tag('SA').split(";") if len(__) > 0]:
-                    __ = __.split(",")
-                    __[1] = int(__[1]) 
-                    print(_.query_name + " :  " , __)
+    for _ in fh.fetch():
+        if _.has_tag('SA'):
+            for __ in [__ for __ in _.get_tag('SA').split(";") if len(__) > 0]:
+                __ = __.split(",")
+                __[1] = int(__[1]) 
+                print(_.query_name + " :  " , __)
 
-                    a = str(genes[__[0]][__[1] - 6 - 1:__[1] - 1])
-                    print ("     A   : ",a)
-                    print ("     A,rc: ",revcomp(a))
+                a = str(genes[__[0]][__[1] - 6 - 1:__[1] - 1])
+                print ("     A   : ",sorted([a, revcomp(a)])[0])
 
-                    b = str(genes[__[0]][__[1] - 1 : __[1] - 1 + 6])
-                    print ("     B   : ",b)
-                    print ("     B,rc: ",revcomp(b))
+                b = str(genes[__[0]][__[1] - 1 : __[1] - 1 + 6])
+                print ("     B   : ",sorted([b, revcomp(b)])[0])
 
-                    end = __[1] + bam_parse_alignment_offset(cigar_to_cigartuple(__[3]))
-                    c = str(genes[__[0]][end - 6 - 1: end - 1])
-                    print ("     C   : ",c)
-                    print ("     C,rc: ",revcomp(c))
+                end = __[1] + bam_parse_alignment_offset(cigar_to_cigartuple(__[3]))
+                c = str(genes[__[0]][end - 6 - 1: end - 1])
+                print ("     C   : ",sorted([c, revcomp(c)])[0])
+                
+                d = str(genes[__[0]][end - 1: end - 1 + 6])
+                print ("     D   : ",sorted([d, revcomp(d)])[0])
+                
+                #print(end)
+                # calculate alignment offset
+                # "• Sum of lengths of the M/I/S/=/X operations shall equal the length of SEQ." - sam spec
 
-                    d = str(genes[__[0]][end - 1: end - 1 + 6])
-                    print ("     D   : ",d)
-                    print ("     D,rc: ",revcomp(d))
-                    
-                    #print(end)
-                    # calculate alignment offset
-                    # "• Sum of lengths of the M/I/S/=/X operations shall equal the length of SEQ." - sam spec
-                    
+
