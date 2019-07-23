@@ -30,7 +30,7 @@ def CLI(input_fasta_file, input_alignment_file):
     query_idx = {}
     artifacted = []
 
-    with Fasta(input_fasta_file) as genes, pysam.AlignmentFile(bam, "rb") as fh:
+    with Fasta(input_fasta_file) as genes, pysam.AlignmentFile(input_alignment_file, "rb") as fh:
         for _ in fh.fetch():
             if _.has_tag('SA'):
                 for __ in [__ for __ in _.get_tag('SA').split(";") if len(__) > 0]:
