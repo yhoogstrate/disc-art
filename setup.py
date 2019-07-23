@@ -2,7 +2,7 @@
 # *- coding: utf-8 -*-
 # vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 textwidth=79:
 
-import src
+import discart
 from setuptools import setup
 
 def get_requirements():
@@ -18,10 +18,10 @@ setup(name="disc-art",
       tests_require=['nose2', 'pytest', 'pytest-cov'],
       setup_requires=[],# scipy, numpy
       install_requires=[get_requirements()],
-      version=src.__version__,
+      version=discart.__version__,
       description="-",
-      author=src.__author__,
-      url=src.__homepage__,
+      author=discart.__author__,
+      url=discart.__homepage__,
       keywords=["rna-seq", "ribo-minus", "random-hexamer"],
       classifiers=[
           'Environment :: Console',

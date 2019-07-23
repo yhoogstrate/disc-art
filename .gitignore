@@ -3,3 +3,7 @@
 /dist
 *.egg-info
 __pycache__
+tmp/*.bam
+tmp/*.sam
+tmp/*.bai
+tmp/*.fai
