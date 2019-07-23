@@ -22,10 +22,13 @@ fa = "/home/youri/bio/fasta/hg38.fa"
 @click.argument('input_fasta_file', type=click.Path(exists=True))
 @click.argument('input_alignment_file', type=click.Path(exists=True))
 def CLI(input_fasta_file, input_alignment_file):
+        """
+        This tool estimates hexamer artifacts, which requirest the genomic sequence in FASTA + FAI format, followed by the ALIGNMENT file in sorted bam.
+        """
+
         # index to search for string codes
         query_idx = {}
         artifacted = []
-
 
         with Fasta(input_fasta_file) as genes, pysam.AlignmentFile(bam, "rb") as fh:
             for _ in fh.fetch():
