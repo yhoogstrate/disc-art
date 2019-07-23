@@ -50,16 +50,11 @@ def bam_diff(f1, f2, T_TEST_DIR):
 bam = sam_to_sorted_bam("test/test_001.sam", "tmp/test_001.sorted.bam", "tmp")
 fa = "/home/youri/bio/fasta/hg38.fa"
 
-print(bam)
-
-import sys
-sys.exit(1)
-
 
 #from string import maketrans
 
 def revcomp(seq):
-    return seq.translate(maketrans('ACGTacgtRYMKrymkVBHDvbhd', 'TGCAtgcaYRKMyrkmBVDHbvdh'))[::-1]
+    return seq.translate(str.maketrans("ACTGactg","TGACtgac"))
     
     
 
@@ -73,5 +68,6 @@ with Fasta(fa) as genes, pysam.AlignmentFile(bam, "rb") as fh:
                     __ = __.split(",")
                     __[1] = int(__[1])
                     print(_.query_name + " :  " , __)
-                    print ("     A   : ",genes[__[0]][__[1] - 6:__[1]])
-                    print ("     A,rc: ",revcomp(genes[__[0]][__[1] - 6:__[1]]))
+                    s = str(genes[__[0]][__[1] - 6:__[1]])
+                    print ("     A   : ",s)
+                    print ("     A,rc: ",revcomp(s))
