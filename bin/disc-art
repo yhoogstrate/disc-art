@@ -11,8 +11,8 @@ import discart
 from discart.utils import *
 
 
-bam = sam_to_sorted_bam("test/test_001.sam", "tmp/test_001.sorted.bam", "tmp")
-fa = "/home/youri/bio/fasta/hg38.fa"
+#bam = sam_to_sorted_bam("test/test_001.sam", "tmp/test_001.sorted.bam", "tmp")
+#fa = "/home/youri/bio/fasta/hg38.fa"
 
 
 
