@@ -38,22 +38,12 @@ def CLI(input_fasta_file, input_alignment_file):
                     __[1] = int(__[1]) 
                     #print(_.query_name + " :  " , __)
 
-                    a = str(genes[__[0]][__[1] - 6 - 1:__[1] - 1])
-                    #a = sorted([a, revcomp(a)])[0]
-                    #print ("     A   : ", a)
-
-                    b = str(genes[__[0]][__[1] - 1 : __[1] - 1 + 6])
-                    #b = sorted([b, revcomp(b)])[0]
-                    #print ("     B   : ", b)
+                    a = str(genes[__[0]][__[1] - 6 - 1:__[1] - 1]).upper()
+                    b = str(genes[__[0]][__[1] - 1 : __[1] - 1 + 6]).upper()
 
                     end = __[1] + bam_parse_alignment_offset(cigar_to_cigartuple(__[3]))
-                    c = str(genes[__[0]][end - 6 - 1: end - 1])
-                    #c = sorted([c, revcomp(c)])[0]
-                    #print ("     C   : ", c)
-                    
-                    d = str(genes[__[0]][end - 1: end - 1 + 6])
-                    #d = sorted([d, revcomp(d)])[0]
-                    #print ("     D   : ", d)
+                    c = str(genes[__[0]][end - 6 - 1: end - 1]).upper()
+                    d = str(genes[__[0]][end - 1: end - 1 + 6]).upper()
 
                     if not _.query_name in query_idx:
                         query_idx[_.query_name] = set([a, b, c, d])
