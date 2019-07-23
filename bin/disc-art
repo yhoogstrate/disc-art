@@ -1,12 +1,59 @@
 #!/usr/bin/env python
 
+import os
 import pysam
 from pyfaidx import Fasta
 
-bam = "/data/disc-o-art/tmp/test_001.Aligned.out.sorted.bam"
+
+def sam_to_sorted_bam(sam, fixed_bam, T_TEST_DIR):
+    basename, ext = os.path.splitext(os.path.basename(sam))
+    bam_file = T_TEST_DIR + '/' + basename + '.bam'
+
+    pysam.sort('-o', bam_file, sam)
+    pysam.index(bam_file)
+
+    return bam_file
+
+def bam_diff(f1, f2, T_TEST_DIR):
+    basename, ext = os.path.splitext(os.path.basename(f1))
+
+    f1sorted = T_TEST_DIR + basename + '.f1.sorted.bam'
+    f2sorted = T_TEST_DIR + basename + '.f2.sorted.bam'
+
+    pysam.sort(f1, '-n', '-o', f1sorted)
+    pysam.sort(f2, '-n', '-o', f2sorted)
+
+    f1sam = T_TEST_DIR + basename + '.f1.sam'
+    f2sam = T_TEST_DIR + basename + '.f2.sam'
+
+    fhq = open(f1sam, "w")
+    fhq.write(pysam.view('-h', f1sorted))
+    fhq.close()
+
+    fhq = open(f2sam, "w")
+    fhq.write(pysam.view('-h', f2sorted))
+    fhq.close()
+
+    subprocess.Popen(['sed', '-i', '-r', 's@(SA:[^\\t]+)\\t(LB:[^\\t]+)\t(RG:[^\\t]+)@\\3\\t\\1\\t\\2@', f2sam], stdout=subprocess.PIPE).stdout.read()
+
+    subprocess.Popen(['sed', '-i', '-r', 's@\\tFI:i:[0-9]+@@', f1sam], stdout=subprocess.PIPE).stdout.read()
+    subprocess.Popen(['sed', '-i', '-r', 's@\\tFI:i:[0-9]+@@', f2sam], stdout=subprocess.PIPE).stdout.read()
+
+    # one time only
+    # subprocess.Popen(['sed', '-i' , '-r', 's@\\tSA:Z:[^\\t]+@@', f1sam], stdout=subprocess.PIPE).stdout.read()
+    # subprocess.Popen(['sed', '-i' , '-r', 's@\\tSA:Z:[^\\t]+@@', f2sam], stdout=subprocess.PIPE).stdout.read()
+
+    return filecmp.cmp(f1sam, f2sam), f1sam, f2sam
+
+
+
+bam = sam_to_sorted_bam("test/test_001.sam", "tmp/test_001.sorted.bam", "tmp")
 fa = "/home/youri/bio/fasta/hg38.fa"
 
+print(bam)
 
+import sys
+sys.exit(1)
 
 
 #from string import maketrans
