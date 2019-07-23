@@ -63,7 +63,6 @@ def CLI(input_fasta_file, input_alignment_file):
 
                         if len(  isct  ) == 1:
                             artifacted.append([_.query_name, list(isct)])
-                            del(query_idx[_.query_name])
                         else:
                             isct = query_idx[_.query_name].intersection(set([revcomp(a), revcomp(b), revcomp(c), revcomp(d)]))
                             isct = [_+"/"+revcomp(_) for _ in isct]
