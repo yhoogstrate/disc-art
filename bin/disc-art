@@ -19,7 +19,7 @@ artifacted = []
 
 
 with Fasta(fa) as genes, pysam.AlignmentFile(bam, "rb") as fh:
-    for _ in tqdm(fh.fetch()):
+    for _ in fh.fetch():
         if _.has_tag('SA'):
             for __ in [__ for __ in _.get_tag('SA').split(";") if len(__) > 0]:
                 __ = __.split(",")
@@ -27,27 +27,37 @@ with Fasta(fa) as genes, pysam.AlignmentFile(bam, "rb") as fh:
                 print(_.query_name + " :  " , __)
 
                 a = str(genes[__[0]][__[1] - 6 - 1:__[1] - 1])
-                a = sorted([a, revcomp(a)])[0]
+                #a = sorted([a, revcomp(a)])[0]
                 print ("     A   : ", a)
 
                 b = str(genes[__[0]][__[1] - 1 : __[1] - 1 + 6])
-                b = sorted([b, revcomp(b)])[0]
+                #b = sorted([b, revcomp(b)])[0]
                 print ("     B   : ", b)
 
                 end = __[1] + bam_parse_alignment_offset(cigar_to_cigartuple(__[3]))
                 c = str(genes[__[0]][end - 6 - 1: end - 1])
-                c = sorted([c, revcomp(c)])[0]
+                #c = sorted([c, revcomp(c)])[0]
                 print ("     C   : ", c)
                 
                 d = str(genes[__[0]][end - 1: end - 1 + 6])
-                d = sorted([d, revcomp(d)])[0]
+                #d = sorted([d, revcomp(d)])[0]
                 print ("     D   : ", d)
 
                 if not _.query_name in query_idx:
                     query_idx[_.query_name] = set([a, b, c, d])
                 else:
                     isct = query_idx[_.query_name].intersection(set([a, b, c, d]))
+                    isct = [_+"/"+_ for _ in isct]
+
                     if len(  isct  ) == 1:
                         artifacted.append([_.query_name, list(isct)])
+                        del(query_idx[_.query_name])
+                    else:
+                        isct = query_idx[_.query_name].intersection(set([revcomp(a), revcomp(b), revcomp(c), revcomp(d)]))
+                        isct = [_+"/"+revcomp(_) for _ in isct]
+
+                        if len(  isct  ) == 1:
+                            artifacted.append([_.query_name, list(isct)])
+                            del(query_idx[_.query_name])
 
 print(artifacted)
