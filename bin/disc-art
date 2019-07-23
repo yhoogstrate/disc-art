@@ -24,24 +24,24 @@ with Fasta(fa) as genes, pysam.AlignmentFile(bam, "rb") as fh:
             for __ in [__ for __ in _.get_tag('SA').split(";") if len(__) > 0]:
                 __ = __.split(",")
                 __[1] = int(__[1]) 
-                print(_.query_name + " :  " , __)
+                #print(_.query_name + " :  " , __)
 
                 a = str(genes[__[0]][__[1] - 6 - 1:__[1] - 1])
                 #a = sorted([a, revcomp(a)])[0]
-                print ("     A   : ", a)
+                #print ("     A   : ", a)
 
                 b = str(genes[__[0]][__[1] - 1 : __[1] - 1 + 6])
                 #b = sorted([b, revcomp(b)])[0]
-                print ("     B   : ", b)
+                #print ("     B   : ", b)
 
                 end = __[1] + bam_parse_alignment_offset(cigar_to_cigartuple(__[3]))
                 c = str(genes[__[0]][end - 6 - 1: end - 1])
                 #c = sorted([c, revcomp(c)])[0]
-                print ("     C   : ", c)
+                #print ("     C   : ", c)
                 
                 d = str(genes[__[0]][end - 1: end - 1 + 6])
                 #d = sorted([d, revcomp(d)])[0]
-                print ("     D   : ", d)
+                #print ("     D   : ", d)
 
                 if not _.query_name in query_idx:
                     query_idx[_.query_name] = set([a, b, c, d])
@@ -60,4 +60,5 @@ with Fasta(fa) as genes, pysam.AlignmentFile(bam, "rb") as fh:
                             artifacted.append([_.query_name, list(isct)])
                             del(query_idx[_.query_name])
 
-print(artifacted)
+for _ in artifacted:
+    print (_[0] + "\t" + ",".join(_[1]))
