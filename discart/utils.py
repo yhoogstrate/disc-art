@@ -1,8 +1,13 @@
 #!/usr/bin/env python
 
+
 import os
+import re
+
 import pysam
 
+
+pat_bam_parse_alignment_offset_using_cigar = re.compile("([0-9]+)([MIDNSHPX=])")
 def cigar_to_cigartuple(cigar_str):
     """Converts a CIGAR string into a tuple compatible with Pysam.
     E.g. '10M5S' becomes: [(0, 10), (4, 5)]

@@ -31,6 +31,12 @@ with Fasta(fa) as genes, pysam.AlignmentFile(bam, "rb") as fh:
                     print ("     B   : ",b)
                     print ("     B,rc: ",revcomp(b))
 
+                    end = __[1] + bam_parse_alignment_offset(cigar_to_cigartuple(__[3]))
+                    c = str(genes[__[0]][end - 6 - 1: end - 1])
+                    print ("     C   : ",c)
+                    print ("     C,rc: ",revcomp(c))
+                    
+                    #print(end)
                     # calculate alignment offset
                     # "• Sum of lengths of the M/I/S/=/X operations shall equal the length of SEQ." - sam spec
                     
