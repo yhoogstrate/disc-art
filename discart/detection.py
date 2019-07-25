@@ -108,7 +108,7 @@ def get_artifacted_reads(input_fasta_file, input_alignment_file, by_sa = False):
 
 
 
-def get_artifacted_read_numbers(input_fasta_file, input_alignment_file):
+def get_artifacted_read_numbers(input_fasta_file, input_alignment_file, by_sa):
 
     # index to search for string codes
     query_idx = {}
@@ -117,7 +117,11 @@ def get_artifacted_read_numbers(input_fasta_file, input_alignment_file):
     with Fasta(str(input_fasta_file)) as genes, pysam.AlignmentFile(input_alignment_file, "rb") as fh:
         for _ in fh.fetch():
             uid = get_read_uid(_) # it is theoretically possible that both mates are split. in that case unique id's are needed
-            sequences = get_hexamers_from_other_splitread(genes, _)
+
+            if by_sa:
+                sequences = get_hexamers_from_other_splitread(genes, _)
+            else:
+                sequences = get_hexamers(genes, _)
 
             if sequences:
                 if not uid in query_idx:

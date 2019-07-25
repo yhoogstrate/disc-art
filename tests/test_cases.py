@@ -24,8 +24,10 @@ class TestCases(unittest.TestCase):
         r = get_artifacted_reads(fa, bam, True)
         self.assertEqual(r, [['SRR934949.17215595', ['ATGTGG/CCACAT']]])
 
-        r = get_artifacted_read_numbers(fa, bam)
-        self.assertEqual(r, (1, 0))
+        r1 = get_artifacted_read_numbers(fa, bam, True)
+        r2 = get_artifacted_read_numbers(fa, bam, False)
+        self.assertEqual(r1, (1, 0))
+        self.assertEqual(r2, (1, 0))
 
  
 if __name__ == '__main__':

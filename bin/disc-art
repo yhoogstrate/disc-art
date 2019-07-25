@@ -18,7 +18,7 @@ def CLI(quantify, sa_tags, input_fasta_file, input_alignment_file):
     """
 
     if quantify:
-        _ = get_artifacted_read_numbers(input_fasta_file, input_alignment_file)
+        _ = get_artifacted_read_numbers(input_fasta_file, input_alignment_file, sa_tags)
         print("Reads affected\tReads not affected\tRatio affected")
         print(str(_[0]) + "\t" + str(_[1]) + "\t" + str(round( float(_[0] * 100.0) / float(_[0] + _[1])  ,2)) + "%")
     else:
