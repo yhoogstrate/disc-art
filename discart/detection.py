@@ -1,14 +1,11 @@
 #!/usr/bin/env python
 
-#import click
-#from tqdm import tqdm
 
-
-#import pysam
+import pysam
 from pyfaidx import Fasta
 
-#import discart
-#from utils import *
+import discart
+from .utils import *
 
 
 
@@ -18,7 +15,7 @@ def get_artifacted_reads(input_fasta_file, input_alignment_file):
     query_idx = {}
     artifacted = []
 
-    with Fasta(input_fasta_file) as genes, pysam.AlignmentFile(input_alignment_file, "rb") as fh:
+    with Fasta(str(input_fasta_file)) as genes, pysam.AlignmentFile(input_alignment_file, "rb") as fh:
         for _ in fh.fetch():
             if _.has_tag('SA'):
                 for __ in [__ for __ in _.get_tag('SA').split(";") if len(__) > 0]:
