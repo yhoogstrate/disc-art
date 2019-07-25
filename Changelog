@@ -1,0 +1,3 @@
+2019-07-25 - Youri Hoogstrate
+	Adds option to quantify number of reads that are  affected and
+	that are not affected (-q / --quantify).
