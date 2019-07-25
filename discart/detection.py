@@ -9,46 +9,16 @@ from .utils import *
 
 
 
-def get_artifacted_reads(input_fasta_file, input_alignment_file):
+def get_read_uid(read):
+    if read.is_paired: # it is theoretically possible that both mates are split. in that case unique id's are needed:
+        if read.is_read1:
+            uid = '1' + read.query_name
+        else:
+            uid = '2' + read.query_name
+    else:
+        uid = '0' + read.query_name
 
-    # index to search for string codes
-    query_idx = {}
-    artifacted = []
-
-    with Fasta(str(input_fasta_file)) as genes, pysam.AlignmentFile(input_alignment_file, "rb") as fh:
-        for _ in fh.fetch():
-            if _.has_tag('SA'):
-                for __ in [__ for __ in _.get_tag('SA').split(";") if len(__) > 0]:
-                    __ = __.split(",")
-                    __[1] = int(__[1]) 
-                    #print(_.query_name + " :  " , __)
-
-                    a = str(genes[__[0]][__[1] - 6 - 1:__[1] - 1]).upper()
-                    b = str(genes[__[0]][__[1] - 1 : __[1] - 1 + 6]).upper()
-
-                    end = __[1] + bam_parse_alignment_offset(cigar_to_cigartuple(__[3]))
-                    c = str(genes[__[0]][end - 6 - 1: end - 1]).upper()
-                    d = str(genes[__[0]][end - 1: end - 1 + 6]).upper()
-
-                    if not _.query_name in query_idx:
-                        query_idx[_.query_name] = set([a, b, c, d])
-                    else:
-                        isct = query_idx[_.query_name].intersection(set([a, b, c, d]))
-                        isct = [_+"/"+_ for _ in isct]
-
-                        if len(  isct  ) == 1:
-                            artifacted.append([_.query_name, list(isct)])
-                        else:
-                            isct = query_idx[_.query_name].intersection(set([revcomp(a), revcomp(b), revcomp(c), revcomp(d)]))
-                            isct = [_+"/"+revcomp(_) for _ in isct]
-
-                            if len(  isct  ) == 1:
-                                artifacted.append([_.query_name, list(isct)])
-
-                        # assume only 2 split reads per mate - if the second is encountered, idx can safely be cleaned
-                        del(query_idx[_.query_name])
-
-    return artifacted
+    return uid
 
 
 
@@ -77,6 +47,43 @@ def get_hexamers_from_other_splitread(genes, splitread):
     return None
 
 
+
+def get_artifacted_reads(input_fasta_file, input_alignment_file):
+
+    # index to search for string codes
+    query_idx = {}
+    artifacted = []
+
+    with Fasta(str(input_fasta_file)) as genes, pysam.AlignmentFile(input_alignment_file, "rb") as fh:
+        for _ in fh.fetch():
+            uid = get_read_uid(_) # it is theoretically possible that both mates are split. in that case unique id's are needed
+            sequences = get_hexamers_from_other_splitread(genes, _)
+
+            if sequences:
+                if not uid in query_idx:
+                    query_idx[uid] = set(sequences)
+                else:
+                    isct = query_idx[uid].intersection(set(sequences))
+                    isct = [_+"/"+_ for _ in isct]
+
+                    if len(  isct  ) == 1:
+                        artifacted.append([uid, list(isct)])
+                    else:
+                        sequences_rc = set([revcomp(sequences[0]), revcomp(sequences[1]), revcomp(sequences[2]), revcomp(sequences[3])])
+
+                        isct = query_idx[uid].intersection(sequences_rc)
+                        isct = [_+"/"+revcomp(_) for _ in isct]
+
+                        if len(  isct  ) == 1:
+                            artifacted.append([uid[1:], list(isct)])
+
+                    # assume only 2 split reads per mate - if the second is encountered, idx can safely be cleaned
+                    del(query_idx[uid])
+
+    return artifacted
+
+
+
 def get_artifacted_read_numbers(input_fasta_file, input_alignment_file):
 
     # index to search for string codes
@@ -85,25 +92,26 @@ def get_artifacted_read_numbers(input_fasta_file, input_alignment_file):
 
     with Fasta(str(input_fasta_file)) as genes, pysam.AlignmentFile(input_alignment_file, "rb") as fh:
         for _ in fh.fetch():
+            uid = get_read_uid(_) # it is theoretically possible that both mates are split. in that case unique id's are needed
             sequences = get_hexamers_from_other_splitread(genes, _)
 
             if sequences:
-                if not _.query_name in query_idx:
-                    query_idx[_.query_name] = set(sequences)
+                if not uid in query_idx:
+                    query_idx[uid] = set(sequences)
                 else:
-                    isct = query_idx[_.query_name].intersection(set(sequences))
+                    isct = query_idx[uid].intersection(set(sequences))
                     isct = [_+"/"+_ for _ in isct]
 
                     if len(  isct  ) == 1:
-                        artifacted.append([_.query_name, list(isct)])
+                        artifacted.append([uid, list(isct)])
                     else:
                         sequences_rc = set([revcomp(sequences[0]), revcomp(sequences[1]), revcomp(sequences[2]), revcomp(sequences[3])])
 
-                        isct = query_idx[_.query_name].intersection(sequences_rc)
+                        isct = query_idx[uid].intersection(sequences_rc)
                         isct = [_+"/"+revcomp(_) for _ in isct]
 
                         if len(  isct  ) == 1:
-                            artifacted.append([_.query_name, list(isct)])
+                            artifacted.append([uid, list(isct)])
 
     return ( len(artifacted), len(query_idx.keys()) - len(artifacted) )
 
