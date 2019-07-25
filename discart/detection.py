@@ -22,6 +22,26 @@ def get_read_uid(read):
 
 
 
+def get_hexamers(genes, splitread):
+    """
+    By CIGAR string
+    """
+
+    if splitread.has_tag('SA'):
+        sa_tags = [_ for _ in splitread.get_tag('SA').split(";") if _.strip() != '']
+        if len(sa_tags) > 1:
+            raise Exception("Not sure when this happens, if this happens")
+        elif len(sa_tags) == 1:
+            a = str(genes[splitread.reference_name][splitread.reference_start - 6:splitread.reference_start]).upper()
+            b = str(genes[splitread.reference_name][splitread.reference_start: splitread.reference_start + 6]).upper()
+
+            c = str(genes[splitread.reference_name][splitread.reference_end - 6: splitread.reference_end]).upper()
+            d = str(genes[splitread.reference_name][splitread.reference_end: splitread.reference_end + 6]).upper()
+
+            return([a, b, c, d])
+
+    return None
+
 def get_hexamers_from_other_splitread(genes, splitread):
     """
     Do not use CIGAR string but SA: tag of other piece of the read
@@ -48,7 +68,7 @@ def get_hexamers_from_other_splitread(genes, splitread):
 
 
 
-def get_artifacted_reads(input_fasta_file, input_alignment_file):
+def get_artifacted_reads(input_fasta_file, input_alignment_file, by_sa = False):
 
     # index to search for string codes
     query_idx = {}
@@ -57,7 +77,11 @@ def get_artifacted_reads(input_fasta_file, input_alignment_file):
     with Fasta(str(input_fasta_file)) as genes, pysam.AlignmentFile(input_alignment_file, "rb") as fh:
         for _ in fh.fetch():
             uid = get_read_uid(_) # it is theoretically possible that both mates are split. in that case unique id's are needed
-            sequences = get_hexamers_from_other_splitread(genes, _)
+
+            if by_sa:
+                sequences = get_hexamers_from_other_splitread(genes, _)
+            else:
+                sequences = get_hexamers(genes, _)
 
             if sequences:
                 if not uid in query_idx:

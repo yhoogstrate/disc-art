@@ -17,10 +17,13 @@ class TestCases(unittest.TestCase):
         
         bam = sam_to_sorted_bam("tests/data/test_" + test + ".sam", "tmp/test_" + test + ".sorted.bam", "tmp")
         fa = os.path.expanduser("~/bio/fasta/hg38.fa")
-        
-        r = get_artifacted_reads(fa, bam)
+
+        r = get_artifacted_reads(fa, bam, False)
+        self.assertEqual(r, [['SRR934949.17215595', ['CCACAT/ATGTGG']]])
+
+        r = get_artifacted_reads(fa, bam, True)
         self.assertEqual(r, [['SRR934949.17215595', ['ATGTGG/CCACAT']]])
-        
+
         r = get_artifacted_read_numbers(fa, bam)
         self.assertEqual(r, (1, 0))
 

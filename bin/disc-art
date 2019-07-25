@@ -9,9 +9,10 @@ from discart.detection import *
 @click.command()
 @click.version_option(discart.__version__ + "\n\n" + discart.__license_notice__ + "\n\nCopyright (C) 2019  " + discart.__author__ + ".\n\nFor more info please visit:\n" + discart.__homepage__)
 @click.option('-q','--quantify', is_flag=True)
+@click.option('-s','--sa-tags', is_flag=True)
 @click.argument('input_fasta_file', type=click.Path(exists=True))
 @click.argument('input_alignment_file', type=click.Path(exists=True))
-def CLI(quantify,input_fasta_file, input_alignment_file):
+def CLI(quantify, sa_tags, input_fasta_file, input_alignment_file):
     """
     This tool estimates hexamer artifacts, which requirest the genomic sequence in FASTA + FAI format, followed by the ALIGNMENT file in sorted bam.
     """
@@ -21,7 +22,7 @@ def CLI(quantify,input_fasta_file, input_alignment_file):
         print("Reads affected\tReads not affected\tRatio affected")
         print(str(_[0]) + "\t" + str(_[1]) + "\t" + str(round( float(_[0] * 100.0) / float(_[0] + _[1])  ,2)) + "%")
     else:
-        for _ in get_artifacted_reads(input_fasta_file, input_alignment_file):
+        for _ in get_artifacted_reads(input_fasta_file, input_alignment_file, sa_tags):
             print (_[0] + "\t" + ",".join(_[1]))
 
 
