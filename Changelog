@@ -1,3 +1,12 @@
-2019-07-25 - Youri Hoogstrate
-	Adds option to quantify number of reads that are  affected and
-	that are not affected (-q / --quantify).
+
+2019-07-25 - v0.0.3 - Youri Hoogstrate
+	- Detection not by default based on contents of SA tag (should be
+	  compatible with dr-disco fixed alignments).
+
+2019-07-25 - v0.0.2 - Youri Hoogstrate
+	- Adds option to quantify number of reads that are  affected and
+	  that are not affected (-q / --quantify).
+
+2019-07-24 - v0.0.1 - Youri Hoogstrate
+	- First working prototype
+
