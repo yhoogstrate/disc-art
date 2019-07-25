@@ -29,9 +29,7 @@ def get_hexamers(genes, splitread):
 
     if splitread.has_tag('SA'):
         sa_tags = [_ for _ in splitread.get_tag('SA').split(";") if _.strip() != '']
-        if len(sa_tags) > 1:
-            raise Exception("Not sure when this happens, if this happens")
-        elif len(sa_tags) == 1:
+        if len(sa_tags) >= 1:
             a = str(genes[splitread.reference_name][splitread.reference_start - 6:splitread.reference_start]).upper()
             b = str(genes[splitread.reference_name][splitread.reference_start: splitread.reference_start + 6]).upper()
 
