@@ -30,11 +30,14 @@ def get_hexamers(genes, splitread):
     if splitread.has_tag('SA'):
         sa_tags = [_ for _ in splitread.get_tag('SA').split(";") if _.strip() != '']
         if len(sa_tags) >= 1:
-            a = str(genes[splitread.reference_name][splitread.reference_start - 6:splitread.reference_start]).upper()
-            b = str(genes[splitread.reference_name][splitread.reference_start: splitread.reference_start + 6]).upper()
+            try:
+                a = str(genes[splitread.reference_name][splitread.reference_start - 6:splitread.reference_start]).upper()
+                b = str(genes[splitread.reference_name][splitread.reference_start: splitread.reference_start + 6]).upper()
 
-            c = str(genes[splitread.reference_name][splitread.reference_end - 6: splitread.reference_end]).upper()
-            d = str(genes[splitread.reference_name][splitread.reference_end: splitread.reference_end + 6]).upper()
+                c = str(genes[splitread.reference_name][splitread.reference_end - 6: splitread.reference_end]).upper()
+                d = str(genes[splitread.reference_name][splitread.reference_end: splitread.reference_end + 6]).upper()
+            except:
+                return None
 
             return([a, b, c, d])
 
