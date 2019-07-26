@@ -43,8 +43,8 @@ class TestCases(unittest.TestCase):
 
         r1 = get_artifacted_read_numbers(fa, bam, True)
         r2 = get_artifacted_read_numbers(fa, bam, False)
-        self.assertEqual(r1, (1, 2)) # 1 artifacted | 1 concordant + 1 non-artifacted split read [t2e]
-        self.assertEqual(r2, (1, 2)) # 1 artifacted | 1 concordant + 1 non-artifacted split read [t2e]
+        self.assertEqual(r1, (1, 2)) # 1 artifacted | 1 concordant + 1 non-artifacted split read
+        self.assertEqual(r2, (1, 2)) # 1 artifacted | 1 concordant + 1 non-artifacted split read
 
  
 if __name__ == '__main__':
