@@ -110,13 +110,14 @@ def get_artifacted_reads(input_fasta_file, input_alignment_file, by_sa = False):
 
 
 def get_artifacted_read_numbers(input_fasta_file, input_alignment_file, by_sa):
+    query_idx = {}# index to search for string codes
 
-    # index to search for string codes
-    query_idx = {}
-    artifacted = []
+    artifacted = set([])
+    all_ids = set([]) # concordant reads
 
     with Fasta(str(input_fasta_file)) as genes, pysam.AlignmentFile(input_alignment_file, "rb") as fh:
         for _ in fh.fetch():
+            all_ids.add(_.query_name)
             uid = get_read_uid(_) # it is theoretically possible that both mates are split. in that case unique id's are needed
 
             if by_sa:
@@ -132,7 +133,7 @@ def get_artifacted_read_numbers(input_fasta_file, input_alignment_file, by_sa):
                     isct = [_+"/"+_ for _ in isct]
 
                     if len(  isct  ) == 1:
-                        artifacted.append([uid, list(isct)])
+                        artifacted.add(uid[1:])
                     else:
                         sequences_rc = set([revcomp(sequences[0]), revcomp(sequences[1]), revcomp(sequences[2]), revcomp(sequences[3])])
 
@@ -140,8 +141,9 @@ def get_artifacted_read_numbers(input_fasta_file, input_alignment_file, by_sa):
                         isct = [_+"/"+revcomp(_) for _ in isct]
 
                         if len(  isct  ) == 1:
-                            artifacted.append([uid, list(isct)])
+                            artifacted.add(uid[1:])
 
-    return ( len(artifacted), len(query_idx.keys()) - len(artifacted) )
+    n = len(artifacted) # number artifacted
+    return (n, len(all_ids) - n)
 
 

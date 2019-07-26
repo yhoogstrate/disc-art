@@ -1,3 +1,5 @@
+2019-07-26 - v0.0.4 - Youri Hoogstrate
+	- Bug fixes, improved quant function
 
 2019-07-25 - v0.0.3 - Youri Hoogstrate
 	- Detection not by default based on contents of SA tag (should be
