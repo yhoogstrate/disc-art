@@ -46,6 +46,17 @@ class TestCases(unittest.TestCase):
         self.assertEqual(r1, (1, 2)) # 1 artifacted | 1 concordant + 1 non-artifacted split read
         self.assertEqual(r2, (1, 2)) # 1 artifacted | 1 concordant + 1 non-artifacted split read
 
+
+    def test_003(self):
+        test = "003"
+        
+        bam = sam_to_sorted_bam("tests/data/test_" + test + ".sam", "tmp/test_" + test + ".sorted.bam", "tmp")
+        fa = os.path.expanduser("~/bio/fasta/hg38.fa")
+
+        r = get_artifacted_reads(fa, bam, False)
+        #self.assertEqual(r, [['SRR934949.17215595', ['CCACAT/ATGTGG']]])
+
+
  
 if __name__ == '__main__':
     main()
