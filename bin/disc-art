@@ -8,21 +8,22 @@ from discart.detection import *
 
 @click.command()
 @click.version_option(discart.__version__ + "\n\n" + discart.__license_notice__ + "\n\nCopyright (C) 2019  " + discart.__author__ + ".\n\nFor more info please visit:\n" + discart.__homepage__)
-@click.option('-q','--quantify', is_flag=True)
-@click.option('-s','--sa-tags', is_flag=True)
+@click.option('-q','--quantify', help="Quantify the number of reads affected. If flag is disabled it will return read ID's + motif sequence", is_flag=True)
+@click.option('-s','--sa-tags', help="This will most likely only work for old STAR alignments, please avoid where possible", is_flag=True)
+@click.option('-k','--kmer-size', default=6, type=int, help="Size of k-mers [default = 6]")
 @click.argument('input_fasta_file', type=click.Path(exists=True))
 @click.argument('input_alignment_file', type=click.Path(exists=True))
-def CLI(quantify, sa_tags, input_fasta_file, input_alignment_file):
+def CLI(quantify, sa_tags, kmer_size, input_fasta_file, input_alignment_file):
     """
-    This tool estimates hexamer artifacts, which requirest the genomic sequence in FASTA + FAI format, followed by the ALIGNMENT file in sorted bam.
+    This tool estimates hexamer artifacts, which requires the genomic sequence in FASTA + FAI format, followed by the ALIGNMENT file in sorted bam.
     """
 
     if quantify:
-        _ = get_artifacted_read_numbers(input_fasta_file, input_alignment_file, sa_tags)
+        _ = get_artifacted_read_numbers(input_fasta_file, input_alignment_file, sa_tags, kmer_size)
         print("Reads affected\tReads not affected\tRatio affected")
         print(str(_[0]) + "\t" + str(_[1]) + "\t" + str(round( float(_[0] * 100.0) / float(_[0] + _[1])  ,2)) + "%")
     else:
-        for _ in get_artifacted_reads(input_fasta_file, input_alignment_file, sa_tags):
+        for _ in get_artifacted_reads(input_fasta_file, input_alignment_file, sa_tags, kmer_size):
             print (_[0] + "\t" + ",".join(_[1]))
 
 

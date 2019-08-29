@@ -1,3 +1,6 @@
+2019-08-29 - v0.0.5 - Youri Hoogstrate
+	- Updated descriptions and option to change kmer-size
+
 2019-07-26 - v0.0.4 - Youri Hoogstrate
 	- Bug fixes, improved quant function
 

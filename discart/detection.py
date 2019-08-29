@@ -22,7 +22,7 @@ def get_read_uid(read):
 
 
 
-def get_hexamers(genes, splitread):
+def get_hexamers(genes, splitread, kmer_size):
     """
     By CIGAR string
     """
@@ -31,11 +31,11 @@ def get_hexamers(genes, splitread):
         sa_tags = [_ for _ in splitread.get_tag('SA').split(";") if _.strip() != '']
         if len(sa_tags) >= 1:
             try:
-                a = str(genes[splitread.reference_name][splitread.reference_start - 6:splitread.reference_start]).upper()
-                b = str(genes[splitread.reference_name][splitread.reference_start: splitread.reference_start + 6]).upper()
+                a = str(genes[splitread.reference_name][splitread.reference_start - kmer_size:splitread.reference_start]).upper()
+                b = str(genes[splitread.reference_name][splitread.reference_start: splitread.reference_start + kmer_size]).upper()
 
-                c = str(genes[splitread.reference_name][splitread.reference_end - 6: splitread.reference_end]).upper()
-                d = str(genes[splitread.reference_name][splitread.reference_end: splitread.reference_end + 6]).upper()
+                c = str(genes[splitread.reference_name][splitread.reference_end - kmer_size: splitread.reference_end]).upper()
+                d = str(genes[splitread.reference_name][splitread.reference_end: splitread.reference_end + kmer_size]).upper()
             except:
                 return None
 
@@ -43,7 +43,7 @@ def get_hexamers(genes, splitread):
 
     return None
 
-def get_hexamers_from_other_splitread(genes, splitread):
+def get_hexamers_from_other_splitread(genes, splitread, kmer_size):
     """
     Do not use CIGAR string but SA: tag of other piece of the read
     """
@@ -56,12 +56,12 @@ def get_hexamers_from_other_splitread(genes, splitread):
             sa_tag = sa_tags[0].split(",")
             sa_tag[1] = int(sa_tag[1]) 
 
-            a = str(genes[sa_tag[0]][sa_tag[1] - 6 - 1:sa_tag[1] - 1]).upper()
-            b = str(genes[sa_tag[0]][sa_tag[1] - 1 : sa_tag[1] - 1 + 6]).upper()
+            a = str(genes[sa_tag[0]][sa_tag[1] - kmer_size - 1:sa_tag[1] - 1]).upper()
+            b = str(genes[sa_tag[0]][sa_tag[1] - 1 : sa_tag[1] - 1 + kmer_size]).upper()
 
             end = sa_tag[1] + bam_parse_alignment_offset(cigar_to_cigartuple(sa_tag[3]))
-            c = str(genes[sa_tag[0]][end - 6 - 1: end - 1]).upper()
-            d = str(genes[sa_tag[0]][end - 1: end - 1 + 6]).upper()
+            c = str(genes[sa_tag[0]][end - kmer_size - 1: end - 1]).upper()
+            d = str(genes[sa_tag[0]][end - 1: end - 1 + kmer_size]).upper()
             
             return([a, b, c, d])
 
@@ -69,7 +69,7 @@ def get_hexamers_from_other_splitread(genes, splitread):
 
 
 
-def get_artifacted_reads(input_fasta_file, input_alignment_file, by_sa = False):
+def get_artifacted_reads(input_fasta_file, input_alignment_file, by_sa, kmer_size):
 
     # index to search for string codes
     query_idx = {}
@@ -80,9 +80,9 @@ def get_artifacted_reads(input_fasta_file, input_alignment_file, by_sa = False):
             uid = get_read_uid(_) # it is theoretically possible that both mates are split. in that case unique id's are needed
 
             if by_sa:
-                sequences = get_hexamers_from_other_splitread(genes, _)
+                sequences = get_hexamers_from_other_splitread(genes, _, kmer_size)
             else:
-                sequences = get_hexamers(genes, _)
+                sequences = get_hexamers(genes, _, kmer_size)
 
             if sequences:
                 if not uid in query_idx:
@@ -109,7 +109,7 @@ def get_artifacted_reads(input_fasta_file, input_alignment_file, by_sa = False):
 
 
 
-def get_artifacted_read_numbers(input_fasta_file, input_alignment_file, by_sa):
+def get_artifacted_read_numbers(input_fasta_file, input_alignment_file, by_sa, kmer_size):
     query_idx = {}# index to search for string codes
 
     artifacted = set([])
