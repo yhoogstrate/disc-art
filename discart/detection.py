@@ -121,9 +121,9 @@ def get_artifacted_read_numbers(input_fasta_file, input_alignment_file, by_sa, k
             uid = get_read_uid(_) # it is theoretically possible that both mates are split. in that case unique id's are needed
 
             if by_sa:
-                sequences = get_hexamers_from_other_splitread(genes, _)
+                sequences = get_hexamers_from_other_splitread(genes, _, kmer_size)
             else:
-                sequences = get_hexamers(genes, _)
+                sequences = get_hexamers(genes, _, kmer_size)
 
             if sequences:
                 if not uid in query_idx:
