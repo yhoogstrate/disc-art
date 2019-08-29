@@ -89,7 +89,7 @@ def get_artifacted_reads(input_fasta_file, input_alignment_file, by_sa, kmer_siz
                     query_idx[uid] = set(sequences)
                 else:
                     isct = query_idx[uid].intersection(set(sequences))
-                    isct = [_+"/"+_ for _ in isct]
+                    isct = [_ + "/" + _ for _ in isct]
 
                     if len(  isct  ) == 1:
                         artifacted.append([uid, list(isct)])
@@ -97,7 +97,7 @@ def get_artifacted_reads(input_fasta_file, input_alignment_file, by_sa, kmer_siz
                         sequences_rc = set([revcomp(sequences[0]), revcomp(sequences[1]), revcomp(sequences[2]), revcomp(sequences[3])])
 
                         isct = query_idx[uid].intersection(sequences_rc)
-                        isct = [_+"/"+revcomp(_) for _ in isct]
+                        isct = [_ + "/" + revcomp(_) for _ in isct]
 
                         if len(  isct  ) == 1:
                             artifacted.append([uid[1:], list(isct)])
